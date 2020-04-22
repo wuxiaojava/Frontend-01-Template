@@ -1,0 +1,29 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>作业2：写一个 UTF-8 Encoding 的函数</title>   
+</head>
+
+<body>
+    输入待转换内容：<input type="text" id="content" />
+    按照utf-8规则转换后内容：<input type="text" id="utf8_content" />
+    <input type="button" onclick="Encoding()" value="转换" />
+</body>
+<script type="text/javascript">
+    function Encoding(){
+        let v_content = document.getElementById("content").value;
+        let length = v_content.length;
+
+        let v_utf8_content = "";
+        if(length > 0){
+            for(let i = 0 ; i < length ;i++){
+                var dec = v_content.charCodeAt(i);
+                var hex = dec.toString(16);;
+                v_utf8_content += ("\\"+hex+" ");
+            }
+            document.getElementById("utf8_content").value = v_utf8_content;
+        }
+    }
+ 
+</script>
+</html>

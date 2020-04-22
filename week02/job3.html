@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>作业3：正则表达式 匹配所有String直接量</title>
+   
+</head>
+
+<body>
+        抽取数据内容：<input type="text" id="inputText"/>
+        <input type="button" onclick="validIsStr();" value="匹配String直接量"/>
+        匹配结果：<div id="result"></div>
+</body>
+ <script type="text/javascript">
+        function validIsStr(){
+            var reg1 = /'([^']*)'/g;//单引号包裹的字符串校验
+            var reg2 = /"([^"]*)"/g;//双引号包裹的字符串校验
+
+            var validStr = document.getElementById("inputText").value;
+
+            var arr01 = validStr.match(reg1);
+            if(arr01 != null){
+                arr01.forEach(function (value, index) {
+                    var clild_div = document.createElement("div");  
+                    clild_div.innerText = value;  
+                    document.getElementById("result").appendChild(clild_div);  
+                    console.log(value);
+                });
+            }
+ 
+            var arr02 = validStr.match(reg2);
+            if(arr02 != null){
+                arr02.forEach(function (value, index) {
+                    var clild_div = document.createElement("div");  
+                    clild_div.innerText = value;  
+                    document.getElementById("result").appendChild(clild_div);  
+                    console.log(value);
+                });
+            }
+        }
+    </script>
+</html>

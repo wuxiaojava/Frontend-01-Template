@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>作业1：正则表达式 匹配所有Number直接量</title>
+   
+</head>
+
+<body>
+        抽取数据内容：<input type="text" id="inputText"/>
+        <input type="button" onclick="validIsNumber();" value="匹配Number直接量"/>
+        </br>匹配结果：<div id="result"></div>
+</body>
+ <script type="text/javascript">
+        function validIsNumber(){
+            var reg1 = /(0|[1-9][0-9]*)/g;//整数类型
+            var reg2 = /\.\d+/g;//小数类型
+            var reg3 = /NaN/g;//NaN类型匹配
+
+            var validNumber = document.getElementById("inputText").value;
+          
+            var arr01 = validNumber.match(reg1);
+            if(arr01 != null){
+                arr01.forEach(function (value, index) {
+                    var clild_div = document.createElement("div");  
+                    clild_div.innerText = value;  
+                    document.getElementById("result").appendChild(clild_div);  
+                    console.log(value);
+                });
+            }
+
+            var arr02 = validNumber.match(reg2);
+            if(arr02 != null){
+                arr02.forEach(function (value, index) {
+                    var clild_div = document.createElement("div");  
+                    clild_div.innerText = value;  
+                    document.getElementById("result").appendChild(clild_div);  
+                    console.log(value);
+                });
+            }
+
+            var arr03 = validNumber.match(reg3);
+            if(arr03 != null){
+                arr03.forEach(function (value, index) {
+                    var clild_div = document.createElement("div");  
+                    clild_div.innerText = value;  
+                    document.getElementById("result").appendChild(clild_div);  
+                    console.log(value);
+                });
+            }
+        }
+    </script>
+</html>
