@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Number与String互相转换</title>
+</head>
+
+<body>
+    字符串：<input type="text" id="strTxt"></input>
+    <br/>
+    <button onclick="convertStringToNumber()" >转换</button>
+</body>
+<script type="text/javascript">
+    function convertStringToNumber(str,x){
+        var i = 0;
+        while(i < chars.length && chars[i] != '.'){
+            number += chars[i].codePointAt(0) - '0'.codePointAt(0);
+            i++;
+        }
+
+        if(chars[i] === '.'){
+            i++;
+        }
+
+        var fraction = 1;
+        while (i < chars.length && chars[i] != '.') {
+            fraction = fraction / x;
+            number += (chars[i].codePointAt(0) - '0'.codePointAt(0)) * fraction;
+            i++;
+        }
+ 
+        return number;
+    }
+
+
+    function convertNumberToString(number,x){
+        var integer = Math.floor(number);
+        var fraction = number - integer;
+        var string = '';
+        while(integer > 0){
+            string = integer % x + string;
+            integer = Math.floor(integer/x);
+        }
+
+        return string;
+    }
+</script>
+
+</html>
