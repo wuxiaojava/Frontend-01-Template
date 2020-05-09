@@ -1,4 +1,6 @@
+//创建set，用于判断是否存在重复元素
 var set = new Set();
+//创建全局属性数组
 var globalProperties = [
     "eval",
     "isFinite",
@@ -48,32 +50,29 @@ var globalProperties = [
     "Math",
     "Reflect"
 ];
-
-
-
+//初始化队列
 var queue = [];
 
+//遍历数组，将数组中的元素放到队列中
 for(var p of globalProperties){
-    console.log(typeof p);
     queue.push({
-        path:[p],
+        path:p,
         object:this[p]
     });
 }
 
-// debugger;
-console.log(queue);
+//声名轮询时，当前操作的元素
 let current;
 
+//遍历队列
 while(queue.length){
     current = queue.shift();
-    console.log(current.path.join('.'));
+    debugger;
+    console.log(current);
     if(set.has(current.object)){
         continue;
     }
     set.add(current.object);
-
-    console.log(current);
 
     let proto = Object.getPrototypeOf(current.object);
     if(proto){
@@ -86,6 +85,7 @@ while(queue.length){
     for (let p of Object.getOwnPropertyNames(current.object)) {
         var property = Object.getOwnPropertyDescriptor(current.object,p);
 
+        console.log([p]);
         if (property.hasOwnProperty["value"] && 
             ((property.value != null) && (typeof property.value == 'object')||(typeof property.value == 'function'))
                 && property.value instanceof Object) {
@@ -96,7 +96,6 @@ while(queue.length){
         }
 
         if ((property.hasOwnProperty["get"]) && (typeof property.get == "function")) {
-            // debugger;
             queue.push(
                 {
                     path: current.path.concat([p]),
@@ -106,7 +105,6 @@ while(queue.length){
         }
 
         if ((property.hasOwnProperty["set"]) && (typeof property.get == "function")){
-            // debugger;
             queue.push(
                 {
                     path: current.path.concat([p]),

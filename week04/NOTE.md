@@ -21,7 +21,7 @@
     2.11 escape()
     2.12 unescape()
 
-3.基本对象 
+3.基本对象
     3.1 Object
     3.2 Function
     3.3 Boolean
