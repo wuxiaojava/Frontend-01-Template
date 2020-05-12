@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>全局内部对象梳理</title>
+</head>
+
+<body>
+    <div id="container">
+
+    </div>
+    <!-- 引入 G6 -->
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.3.1/dist/g6.min.js"></script>
+
+    <script>
+        const data = 
+         {
+                "id": "全局内部对象",
+                "children": [
+                    {
+                        "id": "值属性",
+                        "children": [
+                            {
+                                "id": "Infinity"
+                            },
+                            {
+                                "id": "NaN"
+                            },
+                            {
+                                "id": "undefined"
+                            },
+                            {
+                                "id": "null字面量"
+                            },
+                            {
+                                "id": "globalThis"
+                            }
+                        ]
+                    }, {
+                        "id": "函数属性",
+                        "children": [
+                            {
+                                "id": "eval"
+                            },
+                            {
+                                "id": "uneval"
+                            },
+                            {
+                                "id": "isFinite"
+                            },
+                            {
+                                "id": "isNaN"
+                            },
+                            {
+                                "id": "parseFloat"
+                            },
+                            {
+                                "id": "parseInt"
+                            },
+                            {
+                                "id": "decodeURI"
+                            },
+                            {
+                                "id": "decodeURIComponent"
+                            },
+                            {
+                                "id": "encodeURI"
+                            },
+                            {
+                                "id": "encodeURIComponent"
+                            },
+                            {
+                                "id": "escape"
+                            },
+                            {
+                                "id": "unescape"
+                            }
+                        ]
+                    },  {
+                        "id": "基本对象",
+                        "children": [
+                            {
+                                "id": "Object"
+                            },
+                            {
+                                "id": "Function"
+                            },
+                            {
+                                "id": "Boolean"
+                            },
+                            {
+                                "id": "Symbol"
+                            },
+                            {
+                                "id": "Error"
+                            },
+                            {
+                                "id": "AggregateError"
+                            },
+                            {
+                                "id": "EvalError"
+                            },
+                            {
+                                "id": "InternalError"
+                            },
+                            {
+                                "id": "RangeError"
+                            },
+                            {
+                                "id": "ReferenceError"
+                            },
+                            {
+                                "id": "SyntaxError"
+                            },
+                            {
+                                "id": "TypeError"
+                            },
+                            {
+                                "id": "URIError"
+                            }
+                        ]
+                    },{
+                        "id": "数字和日期对象",
+                        "children": [
+                            {
+                                "id": "Number"
+                            },
+                            {
+                                "id": "BigInt"
+                            },
+                            {
+                                "id": "Math"
+                            },
+                            {
+                                "id": "Date"
+                            }
+                        ]
+                    }, {
+                        "id": "字符串",
+                        "children": [
+                            {
+                                "id": "String"
+                            },
+                            {
+                                "id": "RegExp"
+                            }
+                        ]
+                    }, {
+                        "id": "可索引的集合对象",
+                        "children": [
+                            {
+                                "id": "Array"
+                            },
+                            {
+                                "id": "Int8Array"
+                            },
+                            {
+                                "id": "Uint8Array"
+                            },
+                            {
+                                "id": "Uint8ClampedArray"
+                            },
+                            {
+                                "id": "Int16Array"
+                            },
+                            {
+                                "id": "Uint16Array"
+                            },
+                            {
+                                "id": "Int32Array"
+                            },
+                            {
+                                "id": "Uint32Array"
+                            },
+                            {
+                                "id": "Float32Array"
+                            },
+                            {
+                                "id": "Float64Array"
+                            },
+                            {
+                                "id": "BigInt64Array"
+                            },
+                            {
+                                "id": "BigUint64Array"
+                            }
+                        ]
+                    }, {
+                        "id": "使用键的集合对象",
+                        "children": [
+                            {
+                                "id": "Map"
+                            },
+                            {
+                                "id": "Set"
+                            },
+                            {
+                                "id": "WeekMap"
+                            },
+                            {
+                                "id": "WeekSet"
+                            }
+                        ]
+                    }, {
+                        "id": "结构化数据",
+                        "children": [
+                            {
+                                "id": "ArrayBuffer"
+                            },
+                            {
+                                "id": "SharedArrayBuffer"
+                            },
+                            {
+                                "id": "Atomics"
+                            },
+                            {
+                                "id": "DataView"
+                            },
+                            {
+                                "id": "JSON"
+                            }
+                        ]
+                    }, {
+                        "id": "控制抽象对象",
+                        "children": [
+                            {
+                                "id": "Promise"
+                            },
+                            {
+                                "id": "Generator"
+                            },
+                            {
+                                "id": "GeneratorFunction"
+                            },
+                            {
+                                "id": "AsyncFunction"
+                            },
+                            {
+                                "id": "Iterator"
+                            },
+                            {
+                                "id": "AsyncIterator"
+                            }
+                        ]
+                    }, {
+                        "id": "反射",
+                        "children": [
+                            {
+                                "id": "Reflect"
+                            },
+                            {
+                                "id": "Proxy"
+                            }
+                        ]
+                    }, {
+                        "id": "国际化",
+                        "children": [
+                            {
+                                "id": "Intl"
+                            },
+                            {
+                                "id": "Intl.Collator"
+                            },
+                            {
+                                "id": "Intl.DateTimeFormat"
+                            },
+                            {
+                                "id": "Intl.ListFormat"
+                            },
+                            {
+                                "id": "Intl.NumberFormat"
+                            },
+                            {
+                                "id": "Intl.PluralRules"
+                            },
+                            {
+                                "id": "Intl.RelativeTimeFormat"
+                            },
+                            {
+                                "id": "Intl.locale"
+                            }
+                        ]
+                    }, {
+                        "id": "WebAssembly",
+                        "children": [
+                            {
+                                "id": "WebAssembly"
+                            },
+                            {
+                                "id": "WebAssembly.Module"
+                            },
+                            {
+                                "id": "WebAssembly.Instance"
+                            },
+                            {
+                                "id": "WebAssembly.Memory"
+                            },
+                            {
+                                "id": "WebAssembly.Table"
+                            },
+                            {
+                                "id": "WebAssembly.CompileError"
+                            },
+                            {
+                                "id": "WebAssembly.LineError"
+                            },
+                            {
+                                "id": "WebAssembly.RuntimeError"
+                            }
+                        ]
+                    }, {
+                        "id": "其他",
+                        "children": [
+                            {
+                                "id": "arguments"
+                            }
+                        ]
+                    }
+                ]
+            };
+  
+        const width = document.getElementById('container').scrollWidth;
+        const height = document.getElementById('container').scrollHeight || 1500;
+        const graph = new G6.TreeGraph({
+            container: 'container',
+            width,
+            height,
+            modes: {
+                default: [
+                    {
+                        type: '全局内部对象',
+                        onChange: function onChange(item, collapsed) {
+                            const data = item.get('model').data;
+                            data.collapsed = collapsed;
+                            return true;
+                        },
+                    },
+                    'drag-canvas',
+                    'zoom-canvas',
+                ],
+            },
+            defaultNode: {
+                size: 26,
+                anchorPoints: [
+                    [0, 0.5],
+                    [1, 0.5],
+                ],
+                style: {
+                    fill: '#C6E5FF',
+                    stroke: '#5B8FF9',
+                },
+            },
+            defaultEdge: {
+                type: 'cubic-horizontal',
+                style: {
+                    stroke: '#A3B1BF',
+                },
+            },
+            layout: {
+                type: 'mindmap',
+                direction: 'H',
+                getHeight: () => {
+                    return 16;
+                },
+                getWidth: () => {
+                    return 16;
+                },
+                getVGap: () => {
+                    return 10;
+                },
+                getHGap: () => {
+                    return 50;
+                },
+            },
+        });
+
+        let centerX = 0;
+        graph.node(function (node) {
+            if (node.id === 'Modeling Methods') {
+                centerX = node.x;
+            }
+
+            return {
+                label: node.id,
+                labelCfg: {
+                    position:
+                        node.children && node.children.length > 0
+                            ? 'left'
+                            : node.x > centerX
+                                ? 'right'
+                                : 'left',
+                    offset: 5,
+                },
+            };
+        });
+
+        graph.data(data);
+        graph.render();
+        graph.fitView();
+               
+
+    </script>
+</body>
+
+</html>
