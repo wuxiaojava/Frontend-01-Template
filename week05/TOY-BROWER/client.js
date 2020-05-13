@@ -59,13 +59,11 @@ ${this.bodyText}`;
             }
 
             connection.on('data', (data) => {
-                console.log(data.toString());
                 parser.receive(data.toString());
 
                 if(parser.isFinish){
-                    resolve(parser.getResponse());
+                    resolve(parser.response);
                 }
-                // resolve(data.toString());
                 connection.end();
             });
             connection.on('end', () => {
@@ -115,12 +113,26 @@ class ResponseParse{
         this.headerValue = "";
     }
 
+      get isFinish() {
+          return this.bodyParse && this.bodyParse;
+      }
+
+      get response() {
+          this.statusLine.match(/HTTP\/1.1 ([0-9]+) ([\s\S]+)/);
+          return {
+              statusCode: RegExp.$1,
+              statusText: RegExp.$2,
+              headers: this.headers,
+              body: this.bodyParse.content.join('')
+          }
+      }
+
     receive(string){
         for(let i =0 ; i < string.length ; i++){
             this.receiveChar(string.charAt(i));
         }
-        console.log(this.statusLine);
-        console.log(this.headers);
+        // console.log(this.statusLine);
+        // console.log(this.headers);
     }
 
     receiveChar(char) {
@@ -134,7 +146,7 @@ class ResponseParse{
             if (char === '\n') {
                 this.current = this.WAITING_HEADER_NAME;
             }
-        }else if(this.current === this.WAITING_HEADER_NAME){
+        } else if(this.current === this.WAITING_HEADER_NAME){
             if (char === ':') {
                 this.current = this.WAITING_HEADER_SPACE;
             } else if (char === '\r') {
@@ -145,7 +157,7 @@ class ResponseParse{
             }else {
                 this.headerName += char;
             }
-        }else if(this.current === this.WAITING_HEADER_SPACE) {
+        } else if(this.current === this.WAITING_HEADER_SPACE) {
             if (char === ' ') {
                 this.current = this.WAITING_HEADER_VALUE;
             }  
@@ -173,7 +185,6 @@ class ResponseParse{
     }
 }
 
-
 class TrunkedBodyParse {
     constructor() {
         this.WAITING_LENGTH = 0;
@@ -184,30 +195,15 @@ class TrunkedBodyParse {
 
         this.length = 0;
         this.content = [];
-        this.isFinish = false;
+        this.isFinished = false;
         this.current = this.WAITING_LENGTH;
     }
 
-    get isFinish(){
-        return this.bodyParse && this.bodyParse
-    }
-
-    get respons(){
-        this.statusLine.match(/HTTP\/1.1 ([0-9]+) ([\s\S]+)/);
-        return {
-            statusCode:RegExp.$1,
-            statusText:RegExp.$2,
-            headers:this.headers,
-            body:this.bodyParse.content.join('')
-        }
-    }
-
     receiveChar(char) {
-        //console.log(JSON.stringify(char));
         if(this.current === this.WAITING_LENGTH){
             if (char === '\r') {
                 if(this.length === 0){
-                    console.log(this.content);
+                    // console.log(this.content);
                     this.isFinish = true;
                 }
                 this.current = this.WAITING_LENGTH_LINE_END;
@@ -220,7 +216,9 @@ class TrunkedBodyParse {
                 this.current = this.READING_TRUNK;
             } 
         } else if (this.current === this.READING_TRUNK) {
-            this.content.push(char);
+            if(char != '\r' && char != '\n'){
+                this.content.push(char);
+            }
             this.length --;
             if(this.length === 0){
                 this.current = this.WAITING_NEW_LINE;
@@ -236,7 +234,6 @@ class TrunkedBodyParse {
         }
     }
 }
-
 
 class Response {
 
