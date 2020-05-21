@@ -11,9 +11,8 @@ let rules = [];
 
 function addCSSRules(text){
     var ast = css.parse(text);
-    console.log(JSON.stringify(ast,null,"    "));
+    // console.log(JSON.stringify(ast,null,"    "));
     rules.push(...ast.stylesheet.rules);
-    console.log(rules);
 }
 
 function match(element,selector){
@@ -60,7 +59,6 @@ function computeCSS(element){
         element.computeStyle = {};
     }
 
-    console.log(rules.length);
     for(let rule of rules){
         var selectorParts = rule.selectors[0].split(" ").reverse();
         if(!match(element,selectorParts[0])){
@@ -85,6 +83,7 @@ function computeCSS(element){
             for(var declaration of rule.declarations){
                 if(!computeStyle[declaration.property]){
                     computeStyle[declaration.property] = {};
+                    computeStyle[declaration.property].specificity = sp;
                 }
                 if (computeStyle[declaration.property].specificity){
                     computeStyle[declaration.property].value = declaration.value;
@@ -93,9 +92,16 @@ function computeCSS(element){
                     computeStyle[declaration.property].value = declaration.value;
                     computeStyle[declaration.property].specificity = sp;
                 }
+                
             }
+            element.computeStyle = computeStyle;
         }
     }
+
+    if(element.type != 'text'){
+        console.log(element);
+    }
+    
 }
 
 function compare(sp1,sp2){
@@ -113,9 +119,6 @@ function compare(sp1,sp2){
 }
 
 function emit(token){
-    if(token.type != "text"){   
-        console.log(currentToken);
-    }
     let top = stack[stack.length - 1];
     
     if(token.type == "startTag"){
@@ -145,14 +148,14 @@ function emit(token){
         currentTextNode = null;
     }else if(token.type == "endTag"){ 
         if(top.tagName != token.tagName){
-            console.log("Tag start and doesn't match!");
+            //console.log("Tag start and doesn't match!");
             //throw new Error("Tag start and doesn't match!");
         }else{
             //遇到style标签时，执行添加Css规则的操作
             if(top.tagName == "style"){
                 addCSSRules(top.children[0].content);
             }
-            stack.pop();
+            stack.pop();//??
         }
         currentTextNode = null;
     } else if (token.type == "text") {
