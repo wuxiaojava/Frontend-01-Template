@@ -49,7 +49,6 @@ function specificity(selector){
             p[3] += 1;
         }
     }
-
     return p;
 }
 
@@ -104,6 +103,7 @@ function computeCSS(element){
     
 }
 
+//计算元素的优先级
 function compare(sp1,sp2){
     if(sp1[0] - sp2[0]){
         return sp1[0] - sp2[0];
@@ -120,7 +120,6 @@ function compare(sp1,sp2){
 
 function emit(token){
     let top = stack[stack.length - 1];
-    
     if(token.type == "startTag"){
         let element = {
             type:"element",
@@ -155,7 +154,7 @@ function emit(token){
             if(top.tagName == "style"){
                 addCSSRules(top.children[0].content);
             }
-            stack.pop();//??
+            stack.pop(); 
         }
         currentTextNode = null;
     } else if (token.type == "text") {
@@ -224,6 +223,8 @@ function beforeAttributeName(c){
     }
 }
 
+ 
+
 function attributeName(c){
     if (c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
         return afterAttributeName(c);
@@ -281,21 +282,6 @@ function singleQuotedAttributeValue(c){
     }
 }
 
-function afterQuotedAttributeValue(c){
-    if(c.match(/^[\t\n\f ]$/)){
-        return beforeAttributeName;
-    } else if (c == "/") {
-        return selfClosingStartTag;
-    } else if (c == ">") {
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        emit(currentToken);
-        return data;
-    } else {
-        currentAttribute.value += c;
-        return doubleQuotedAttributeValue;
-    }
-}
-
 function UnquotedAttributeValue(c){
     if(c.match(/^[\t\n\f ]$/)){
         currentToken[currentAttribute.name] = currentAttribute.value;
@@ -318,6 +304,24 @@ function UnquotedAttributeValue(c){
          return UnquotedAttributeValue;
     }
 }
+
+
+function afterQuotedAttributeValue(c){
+    if(c.match(/^[\t\n\f ]$/)){
+        return beforeAttributeName;
+    } else if (c == "/") {
+        return selfClosingStartTag;
+    } else if (c == ">") {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken);
+        return data;
+    } else {
+        currentAttribute.value += c;
+        return doubleQuotedAttributeValue;
+    }
+}
+
+
 
 function selfClosingStartTag(c){
     if(c == ">"){
@@ -402,37 +406,43 @@ function data(c) {
 //     return stack[0];
 // }
 
-var html = `<html a=b>
-    <head>
-    <style>
-    body div# myid {
-        width: 100 px;
-        background-color: #ff5000;
-    }
-    body div img {
-        width: 30px;
-        background-color: #ff1111;
-    } 
+var html = `<img id = myDiv />`;
 
-    </style> 
-    </head>
-    <body>
-        <div>
-            <img id = "myDiv" />
-            <img />
-        </div> 
-    </body>
-</html>
-`;
+// var html = `<html a=b>
+//     <head>
+//     <style>
+//     body div #myid {
+//         width: 100 px;
+//         background-color: #ff5000;
+//     }
+//     body div img {
+//         width: 30px;
+//         background-color: #ff1111;
+//     } 
+
+//     </style> 
+//     </head>
+//     <body>
+//         <div>
+//             <img id = myDiv />
+//             <img />
+//         </div> 
+//     </body>
+// </html>
+// `;
 
 
 function parseHTML(html){
     let state = data;
     for(let c of html){
+        console.log(state.prototype.constructor.name);
+        console.log(c);
         state = state(c);
+        console.log(state.prototype.constructor.name);
     }
 
     state = state(EOF);
+    //console.log(stack[0]);
     return stack[0];
 }
 
