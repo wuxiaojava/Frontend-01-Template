@@ -1,5 +1,8 @@
 const net = require('net');
 const parser = require("./parser");
+
+const render = require("./render");
+const images = require("images");
 /***
  * requet format
  * ----request line----
@@ -132,8 +135,6 @@ class ResponseParse{
         for(let i =0 ; i < string.length ; i++){
             this.receiveChar(string.charAt(i));
         }
-        // console.log(this.statusLine);
-        // console.log(this.headers);
     }
 
     receiveChar(char) {
@@ -204,7 +205,6 @@ class TrunkedBodyParse {
         if(this.current === this.WAITING_LENGTH){
             if (char === '\r') {
                 if(this.length === 0){
-                    // console.log(this.content);
                     this.isFinish = true;
                 }
                 this.current = this.WAITING_LENGTH_LINE_END;
@@ -258,40 +258,11 @@ void async function(){
     let response = await request.send();
     let dom = parser.parseHTML(response.body);
 
-    console.log(JSON.stringify(dom,null,"   "));
+    // console.log(JSON.stringify(dom,null,"   "));
+    // let viewport = images(800,600);
+
+    // render(viewport,dom);
+
+    // viewport.save("viewport.jpg");
 }();
-
- 
-// const client = net.createConnection({
-//     host: "127.0.0.1",
-//     port: 8088
-// }, () => {
-//     // 'connect' 监听器
-//     console.log('已连接到服务器');
-
-
-//     let request = new Request({
-//         method:"POST",
-//         host:"127.0.0.1",
-//         path:"/",
-//         port:8088,
-//         headers:{
-//             //对象直接量？？
-//             ["X-Foo2"]:"customed"
-//         },
-//         body:{
-//             name:"winter"
-//         }
-//     });
-
-//     console.log(request.toString());
-//     client.write(request.toString());
-//     // client.write('POST /  HTTP/1.1\r\n');
-//     // // client.write('Host: 127.0.0.1\r\n ');
-    
-//     // client.write('Content-Type: application/x-wwww-form-urlencoded\r\n');
-//     // client.write('Content-Length: 11\r\n');
-//     // client.write('\r\n')
-//     // client.write('name=winter\r\n');
-// })
 

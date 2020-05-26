@@ -100,7 +100,7 @@ function computeCSS(element){
     }
 
     if(element.type != 'text'){
-        console.log(element);
+        // console.log(element);
     }
     
 }
@@ -397,56 +397,13 @@ function data(c) {
     }
 }
 
-// module.exports.parseHTML = 
-
-// function parseHTML(html){
-//     for(let c of html){
-//         //获取状态
-//         state = data(c);
-//     }
-
-//     state = data(EOF);
-//     return stack[0];
-// }
-
-var html = `<img id = myDiv />`;
-
-// var html = `<html a=b>
-//     <head>
-//     <style>
-//     body div #myid {
-//         width: 100 px;
-//         background-color: #ff5000;
-//     }
-//     body div img {
-//         width: 30px;
-//         background-color: #ff1111;
-//     } 
-
-//     </style> 
-//     </head>
-//     <body>
-//         <div>
-//             <img id = myDiv />
-//             <img />
-//         </div> 
-//     </body>
-// </html>
-// `;
-
-
-function parseHTML(html){
+module.exports.parseHTML = function parseHTML(html) {
     let state = data;
-    for(let c of html){
-        console.log(state.prototype.constructor.name);
-        console.log(c);
+    for (let c of html) {
         state = state(c);
-        console.log(state.prototype.constructor.name);
     }
 
     state = state(EOF);
-    //console.log(stack[0]);
     return stack[0];
 }
-
-parseHTML(html);
+ 
