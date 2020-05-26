@@ -247,7 +247,6 @@ void async function(){
         path: "/",
         port: 8088,
         headers: {
-            //对象直接量？？
             ["X-Foo2"]: "customed"
         },
         body: {
@@ -256,13 +255,12 @@ void async function(){
     });
 
     let response = await request.send();
+    console.log(response.body);
     let dom = parser.parseHTML(response.body);
 
     // console.log(JSON.stringify(dom,null,"   "));
     // let viewport = images(800,600);
-
     // render(viewport,dom);
-
     // viewport.save("viewport.jpg");
 }();
 

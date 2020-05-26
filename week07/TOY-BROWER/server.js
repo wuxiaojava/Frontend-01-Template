@@ -5,18 +5,7 @@ const server = http.createServer((req, res) => {
     res.setHeader('X-Foo', 'bar');
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(
-`<html >
-    <head>
-        <style>
-            
-        </style>
-    </head>
-    <body>
-        <div>
-             
-        </div>
-    </body>
-</html>`);
+`<html></html>`);
 });    
 
 server.listen(8088);

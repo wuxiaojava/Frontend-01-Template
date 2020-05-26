@@ -11,12 +11,14 @@ let currentTextNode = null;
 //加入一个新的函数 addCSSRules,这里我们把css规则暂存到一个数组里
 let rules = [];
 
+//收集CSS rules
 function addCSSRules(text){
     var ast = css.parse(text);
     // console.log(JSON.stringify(ast,null,"    "));
     rules.push(...ast.stylesheet.rules);
 }
 
+//元素与css样式选择器进行匹配
 function match(element,selector){
     if(!selector || !element.attributes){
         return false;
@@ -39,6 +41,7 @@ function match(element,selector){
     }
 }
 
+//使用四元运算符，计算优先级
 function specificity(selector){
     var p = [0,0,0,0];
     var selectorParts = selector.split(" ");
@@ -54,6 +57,7 @@ function specificity(selector){
     return p;
 }
 
+//计算元素的CSS,并将结果赋值给元素的computeStyle属性
 function computeCSS(element){
     var elements = stack.slice().reverse();
     if(!element.computeStyle){
@@ -139,7 +143,7 @@ function emit(token){
                 });
             }
         }
-        computeCSS(element);
+        //computeCSS(element);
         top.children.push(element);
 
         if(!token.isSelfClosing){
@@ -156,7 +160,7 @@ function emit(token){
             if(top.tagName == "style"){
                 addCSSRules(top.children[0].content);
             }
-            layout(top);
+            //layout(top);
             stack.pop(); 
         }
         currentTextNode = null;
@@ -170,7 +174,6 @@ function emit(token){
         }
         currentTextNode.content += token.content;
     }
-    
 }
 
 
@@ -193,6 +196,7 @@ function tagOpen(c){
     }
 }
 
+//标签名状态
 function tagName(c){
     if(c.match(/^[\t\n\f ]$/)){
         return beforeAttributeName;
@@ -210,6 +214,7 @@ function tagName(c){
     }
 }
 
+//属性名准备状态
 function beforeAttributeName(c){
     if(c.match(/^[\t\n\f ]$/)){
         return beforeAttributeName;
@@ -226,8 +231,7 @@ function beforeAttributeName(c){
     }
 }
 
- 
-
+//属性名状态
 function attributeName(c){
     if (c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
         return afterAttributeName(c);
@@ -243,6 +247,33 @@ function attributeName(c){
     }
 }
 
+//属性名结束状态
+function afterAttributeName(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
+        return afterAttributeName;
+    } else if (c == "/") {
+        return selfClosingStartTag;
+    } else if (c == "=") {
+        return beforeAttributeValue;
+    } else if (c == ">") {
+        if (!currentAttribute) {
+            currentToken[currentAttribute.name] = currentAttribute.value;
+            emit(currentToken);
+        }
+        return data;
+    } else if (c == EOF) {
+
+    } else {
+        currentAttribute = {
+            name: "",
+            value: ""
+        };
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        return attributeName(c);
+    }
+}
+
+//value值准备状态
 function beforeAttributeValue(c){
     if (c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
         return beforeAttributeValue;
@@ -257,6 +288,7 @@ function beforeAttributeValue(c){
     }
 }
 
+//双引号value值状态
 function doubleQuotedAttributeValue(c){
     if(c == "\""){
         currentToken[currentAttribute.name] = currentAttribute.value;
@@ -271,6 +303,7 @@ function doubleQuotedAttributeValue(c){
     }
 }
 
+//单引号value值状态
 function singleQuotedAttributeValue(c){
     if (c == "\"") {
         currentToken[currentAttribute.name] = currentAttribute.value;
@@ -285,6 +318,7 @@ function singleQuotedAttributeValue(c){
     }
 }
 
+//无引号value值状态
 function UnquotedAttributeValue(c){
     if(c.match(/^[\t\n\f ]$/)){
         currentToken[currentAttribute.name] = currentAttribute.value;
@@ -324,8 +358,7 @@ function afterQuotedAttributeValue(c){
     }
 }
 
-
-
+//自结束标签状态
 function selfClosingStartTag(c){
     if(c == ">"){
         currentToken.isSelfClosing = true;
@@ -338,6 +371,7 @@ function selfClosingStartTag(c){
     }
 }
 
+//标签关闭状态
 function endTagOpen(c){
     if(c.match(/^[a-zA-Z]$/)){
         currentToken = {
@@ -354,34 +388,12 @@ function endTagOpen(c){
     }
 }
 
-function afterAttributeName(c){
-    if(c.match(/^[\t\n\f ]$/)){
-        return afterAttributeName;
-    }else if(c == "/"){
-        return selfClosingStartTag;
-    }else if(c == "="){
-        return beforeAttributeValue;
-    }else if(c == ">"){
-        currentToken[currentAttribute.attributeName] = currentAttribute.value;
-        emit(currentToken);
-        return data;
-    }else if(c == EOF){
-        
-    }else{
-        currentToken[currentAttribute.attributeName] = currentAttribute.value;
-        currentAttribute = {
-            name:"",
-            value:""
-        };
-        return attributeName(c);
-    }
-}
 
-
+//负责分发状态
 function data(c) {
     if (c == "<") {
         return tagOpen;
-    } else if(c == "<"){
+    } else if(c == ">"){
         return endTagOpen;
     } else if (c == EOF) {
         emit({
