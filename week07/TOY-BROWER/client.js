@@ -255,12 +255,9 @@ void async function(){
     });
 
     let response = await request.send();
-    console.log(response.body);
     let dom = parser.parseHTML(response.body);
-
-    // console.log(JSON.stringify(dom,null,"   "));
-    // let viewport = images(800,600);
-    // render(viewport,dom);
-    // viewport.save("viewport.jpg");
+    let viewport = images(800,600);
+    render(viewport,dom);
+    viewport.save("viewport.jpg");
 }();
 

@@ -1,11 +1,22 @@
+//引入第三方插件 用来生成css结构
 const css = require("css");
+
+//引入layout插件，进行布局相关操作
 const layout = require("./layout");
 
+//定义 文件结束 标记
 const EOF = Symbol("EOF");//end of file 
 
+//定义当前token
 let currentToken = null;
+
+//定义当前token的属性对象
 let currentAttribute = null;
+
+//定义数组，模拟栈操作 默认放入document元素进站
 let stack = [{type:"document",children:[]}];
+
+//定义当前文本节点
 let currentTextNode = null;
 
 //加入一个新的函数 addCSSRules,这里我们把css规则暂存到一个数组里
@@ -87,29 +98,28 @@ function computeCSS(element){
 
             for(var declaration of rule.declarations){
                 if(!computeStyle[declaration.property]){
-                    computeStyle[declaration.property] = {};
-                    computeStyle[declaration.property].specificity = sp;
+                    computeStyle[declaration.property] = declaration.value;
                 }
-                if (computeStyle[declaration.property].specificity){
+                if (!computeStyle[declaration.property].specificity){
                     computeStyle[declaration.property].value = declaration.value;
                     computeStyle[declaration.property].specificity = sp;
                 } else if (compare(computeStyle[declaration.property].specificity,sp) < 0){
-                    computeStyle[declaration.property].value = declaration.value;
-                    computeStyle[declaration.property].specificity = sp;
+                    for(var k = 0; k <4 ; k++){
+                        computeStyle[declaration.property][declaration.value][k] += sp[k];
+                    }
                 }
                 
             }
-            element.computeStyle = computeStyle;
         }
     }
 
     if(element.type != 'text'){
-        // console.log(element);
+        console.log(element.computeStyle);
     }
     
 }
 
-//计算元素的优先级
+//比较元素的优先级
 function compare(sp1,sp2){
     if(sp1[0] - sp2[0]){
         return sp1[0] - sp2[0];
@@ -124,6 +134,7 @@ function compare(sp1,sp2){
     return sp1[3] - sp2[3];
 }
 
+//构造元素队列
 function emit(token){
     let top = stack[stack.length - 1];
     if(token.type == "startTag"){
@@ -134,7 +145,7 @@ function emit(token){
         };
 
         element.tagName = token.tagName;
-
+        //遍历token的属性
         for(let p in token){
             if(p != "type" || p != "tagName"){
                 element.attributes.push({
@@ -143,9 +154,9 @@ function emit(token){
                 });
             }
         }
-        //computeCSS(element);
+        computeCSS(element);
         top.children.push(element);
-
+        element.parent = top;
         if(!token.isSelfClosing){
             stack.push(element);
         }
@@ -160,7 +171,7 @@ function emit(token){
             if(top.tagName == "style"){
                 addCSSRules(top.children[0].content);
             }
-            //layout(top);
+            layout(top);
             stack.pop(); 
         }
         currentTextNode = null;
@@ -318,6 +329,22 @@ function singleQuotedAttributeValue(c){
     }
 }
 
+//引号value结束状态
+function afterQuotedAttributeValue(c) {
+    if (c.match(/^[\t\n\f ]$/)) {
+        return beforeAttributeName;
+    } else if (c == "/") {
+        return selfClosingStartTag;
+    } else if (c == ">") {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken);
+        return data;
+    } else {
+        currentAttribute.value += c;
+        return doubleQuotedAttributeValue;
+    }
+}
+
 //无引号value值状态
 function UnquotedAttributeValue(c){
     if(c.match(/^[\t\n\f ]$/)){
@@ -339,22 +366,6 @@ function UnquotedAttributeValue(c){
     } else{
          currentAttribute.value += c;
          return UnquotedAttributeValue;
-    }
-}
-
-
-function afterQuotedAttributeValue(c){
-    if(c.match(/^[\t\n\f ]$/)){
-        return beforeAttributeName;
-    } else if (c == "/") {
-        return selfClosingStartTag;
-    } else if (c == ">") {
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        emit(currentToken);
-        return data;
-    } else {
-        currentAttribute.value += c;
-        return doubleQuotedAttributeValue;
     }
 }
 
@@ -416,6 +427,7 @@ module.exports.parseHTML = function parseHTML(html) {
     }
 
     state = state(EOF);
+    console.log(stack);
     return stack[0];
 }
  

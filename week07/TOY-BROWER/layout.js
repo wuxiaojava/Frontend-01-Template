@@ -3,9 +3,11 @@ function getStyle(element){
         element.style = {};
     }
 
-    for(let prop in element.computedStyle){
-        var p = element.computedStyle.value;
-        element.style[prop] = element.computedStyle[prop].value;
+    for(let prop in element.computeStyle){
+        var p = element.computeStyle.value;
+        console.log(element.computeStyle[prop]);
+        var propValue = element.computeStyle[prop];
+        element.style[prop] = propValue;
 
         if(element.style[prop].toString().match(/px$/)){
             element.style[prop] = parseInt(element.style[prop]  );
@@ -15,7 +17,7 @@ function getStyle(element){
             element.style[prop] = parseInt(element.style[prop]);
         }
     }
-
+    console.log("style:"+element.style);
     return element.style;
 }
 
@@ -68,7 +70,7 @@ function layout(element){
     }
 
     //声明与布局相关的变量
-    var mainSize,mainStart,mainEnd,mainSign,mainBase,//主轴相关
+    var mainSize,mainStart,mainEnd,mainSign,mainBase,//主轴相关  mainBase 主轴上从左到右方向 mainSigniS
         crossSize,crossStart,crossEnd,crossSign,crossBase;//交叉轴相关
 
     //主轴方向为横向，从左到右排列方向
@@ -259,7 +261,7 @@ function layout(element){
                     var currentMain = step / 2 + mainBase;
                 }
 
-                for(var i = 0 ;i < item.length ;i++){
+                for(var i = 0 ;i < items.length ;i++){
                     var item = items[i];
                     itemStyle[mainStart,mainEnd];
                     itemStyle[mainEnd] = itemStyle[mainStart] + mainSign + itemStyle[mainSize];
@@ -275,7 +277,7 @@ function layout(element){
         crossSpace = 0;
         elementStyle[crossSize] = 0;
         for(var i = 0; i < flexLines.length;i++){
-            elementStyle[crossSize] = elementStyle[crossSize] + flexline[i].crossSize;
+            elementStyle[crossSize] = elementStyle[crossSize] + flexLines[i].crossSize;
         }
     }else{
         crossSpace = style[crossSize];
