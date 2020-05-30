@@ -9,22 +9,21 @@ const server = http.createServer((req, res) => {
     <head>
         <style>
             #container {
-                width:500px;
                 height:300px;
                 display:flex;
                 background-color:rgb(255,255,255);
             }
             #container #myid {
                 width:200px;
-                height:300px;
+                height:100px;
                 display:flex;
                 background-color:rgb(255,0,0);
             }
 
             #container .c1 {
-                width: 100px;
-                height:300px;
-                flex:1;
+                width:100px;
+                height:200px;
+                display:flex;
                 background-color:rgb(0,255,0);
             }
         </style>

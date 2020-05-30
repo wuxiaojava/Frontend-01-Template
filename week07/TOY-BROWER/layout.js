@@ -51,7 +51,7 @@ function layout(element){
 
     //主轴占满？
     if (!style.alignItems || style.alignItems === "auto") {
-        style.justifyContent = "stretch";
+        style.alignItems = "flex-start";
     }
 
     //主轴元素左对齐
@@ -61,7 +61,7 @@ function layout(element){
 
     //默认换行
     if (!style.flexWrap || style.flexWrap === "auto") {
-        style.flexWrap = "wrap";
+        style.flexWrap = "nowrap";
     }
 
     //轴线占满整个交叉轴
@@ -69,9 +69,19 @@ function layout(element){
         style.alignConent = "stretch";
     }
 
-    //声明与布局相关的变量
-    var mainSize,mainStart,mainEnd,mainSign,mainBase,//主轴相关  mainBase 主轴上从左到右方向 mainSigniS
-        crossSize,crossStart,crossEnd,crossSign,crossBase;//交叉轴相关
+    //主轴相关属性 
+    var mainSize,//主轴的方向名称  width or height
+        mainStart,//主轴的开始位置 
+        mainEnd,//主轴的结束位置
+        mainSign,//主轴的方向
+        mainBase;//
+    
+    //交叉轴相关属性 
+    var crossSize,//交叉轴的大小
+        crossStart,//交叉轴的开始位置
+        crossEnd,//交叉轴的结束位置
+        crossSign,//交叉轴的方向
+        crossBase;//交叉轴相关
 
     //主轴方向为横向，从左到右排列方向
     if(style.flexDirection === "row"){
@@ -119,22 +129,29 @@ function layout(element){
 
     //判断flexWrap是否为从下往上排,如果是，则更改交叉轴的方向相关的属性
     if(style.flexWrap === "wrap-reverse"){
+        //改变交叉轴的方向   
         var tmp = crossStart;
         crossStart = crossEnd;
         crossEnd = tmp;
+
         //?crossBase未定义
         crossSign = -1;
     }else{
         crossBase = 0;
-        crossSign = +1;
+        crossSign = +1;//交叉轴正向  （从上到下，或从做到右)
     }
 
     var isAutoMainSize = false;
 
+    //判断是否存在主轴大小的属性  
     if(!style[mainSize]) {
+        //不存在默认为0
         elementStyle[mainSize] = 0;
+        //遍历其子元素，计算主轴的大小   计算方法：父元素主轴大小 = sum(子元素主轴大小)
         for(var i = 0; i < items.length; i++){
-            var item = items[i];
+            var item = items[i];//获取子元素
+            var itemStyle = getStyle(item);
+            //子元素存在主轴大小属性，则进行累加
             if (itemStyle[mainSize] !== null || itemStyle[mainSize] !== (void 0)) {
                 elementStyle[mainSize] = elementStyle[mainSize] + itemStyle[mainSize];
             }
@@ -145,24 +162,27 @@ function layout(element){
     var flexLine = [];
     var flexLines = [flexLine];
 
-    var mainSpace = elementStyle[mainSize];
-    var crossSpace = 0;
+    var mainSpace = elementStyle[mainSize];//获取主轴的大小
+    var crossSpace = 0;//默认交叉轴大小
 
     //compute Axis 遍历当前元素的子元素
     for(var i = 0 ; i < items.length; i++){
         var item = items[i];
         var itemStyle = getStyle(item);
 
+        //如果主轴没有设定大小属性，则默认为0 
         if(itemStyle[mainSize] === null){
             itemStyle[mainSize] = 0;
         }
+
 
         if(itemStyle.flex){
             flexLine.push(item);
         }else if(style.flexWrap === "nowrap" && isAutoMainSize){
             mainSpace -= itemStyle[mainSize];
             if(itemStyle[crossSize] != null && itemStyle[crossSize] != (void 0)){
-                crossSpace = Max.max(crossSpace,itemStyle[crossSize]);
+                // crossSpace = Math.Max.max(crossSpace,itemStyle[crossSize]);
+                crossSpace = itemStyle[crossSize];
             }
             flexLine.push(item);
         }else{
@@ -263,9 +283,15 @@ function layout(element){
 
                 for(var i = 0 ;i < items.length ;i++){
                     var item = items[i];
-                    itemStyle[mainStart,mainEnd];
-                    itemStyle[mainEnd] = itemStyle[mainStart] + mainSign + itemStyle[mainSize];
+                    var itemStyle = getStyle(item);
+
+                    itemStyle[mainStart] = step;
+                    
+                    // itemStyle[mainStart,mainEnd];
+                    // itemStyle[mainStart] = currentMain;
+                    itemStyle[mainEnd] = itemStyle[mainStart] + mainSign * itemStyle[mainSize];
                     currentMain = itemStyle[mainEnd] + step;
+                    step += currentMain;
                 }
             }
         });
@@ -331,6 +357,10 @@ function layout(element){
             if(itemStyle[crossSize] === null){
                 itemStyle[crossSize] = (align === 'stretch') ? lineCrossSize : 0;
             }
+
+            // if(!align){
+            //     align = 'flex-start';
+            // }
 
             if(align === 'flex-start'){
                 itemStyle[crossStart] = crossBase;

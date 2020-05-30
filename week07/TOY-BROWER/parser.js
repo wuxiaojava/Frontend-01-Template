@@ -236,9 +236,9 @@ function emit(token){
         
         if(!token.isSelfClosing){
             stack.push(element);
-            // console.log(`元素 <${element.tagName}> 入栈`);
-            // console.log(`当前栈大小为： ${stack.length}`);
-            // console.log(`当前栈顶元素： <${stack[stack.length-1].tagName}>`);
+            console.log(`元素 <${element.tagName}> 入栈`);
+            console.log(`当前栈大小为： ${stack.length}`);
+            console.log(`当前栈顶元素： <${stack[stack.length-1].tagName}>`);
         }
 
         //当前节点不是文本节点，所以，当前文本结点置为空
@@ -259,9 +259,9 @@ function emit(token){
             layout(top);
             //栈顶元素出栈
             stack.pop(); 
-            // console.log(`元素 <${top.tagName}> 出栈`);
-            // console.log(`当前栈大小为： ${stack.length}`);
-            // console.log(`当前栈顶元素： <${stack[stack.length-1].tagName}>`);
+            console.log(`元素 <${top.tagName}> 出栈`);
+            console.log(`当前栈大小为： ${stack.length}`);
+            console.log(`当前栈顶元素： <${stack[stack.length-1].tagName}>`);
         }
         currentTextNode = null;
     } else if (token.type == "text") {
