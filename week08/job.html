@@ -6,59 +6,137 @@
 </head>
 <body>
     <div id="myId" class="myClass"></div>
+    <div class="parent">
+        <div>
+            <span id="spanid"> 
+
+            </span>
+        </div>
+    </div>
     <script>
         function match(selector, element) {
-            var isMatch = false;
+            if(element){
+                var isMatch = false;
+                var selectorParts = [];
 
-            // 定义简单浏览器的正则对象
-            var reg_class = new RegExp('\\.[a-zA-Z0-9]{1,}', 'g');
-            var reg_id = new RegExp('#[a-zA-Z0-9]{1,}', 'g');
-            var reg_pseudo_class = new RegExp(':[a-zA-Z0-9]{1,}', 'g');
-
-            var selectorParts = [];
-           
-            if (selector.indexOf(" ") != -1) {
-                selectorParts = selector.split(" ");
-            } else if (selector.indexOf(">") != -1) {
-                selectorParts = selector.split(">");
-            } else if (selector.indexOf("~") != -1) {
-                selectorParts = selector.split("~");
-            } else if (selector.indexOf("+") != -1) {
-                selectorParts = selector.split("+");
-            } else if (selector.indexOf("||") != -1) {
-                selectorParts = selector.split("||");
-            } else {
-                var idSelector = reg_id.exec(selector);
-                if (idSelector) {
-                    var attr = element.getAttribute("id");
-                    if (attr && attr === idSelector[0].replace("#", '')) {
-                        isMatch = true;
+                // 后代选择器
+                if (selector.indexOf(" ") != -1) {
+                    //获取后代选择器的两部分
+                    selectorParts = selector.split(" ");
+                    //获取后代选择器
+                    currentSelector = selectorParts[1];
+                    console.log(element.tagName);
+                    //匹配当前元素与选择器的后代选择器部分
+                    isWatch = easySelectorMatch(currentSelector, element);
+                    
+                    //最尾部标签匹配成功后，去匹配父代的节点
+                    if (isWatch) {
+                        var pNode = element.parentNode;
+                        console.log(pNode.nodeName);
+                        if(pNode){
+                            isContinue = true;
+                            while (pNode) {
+                                isWatch = easySelectorMatch(selectorParts[0], pNode);
+                                if (isWatch) {
+                                    break;
+                                } else {
+                                    pNode = pNode.parentNode;
+                                }
+                            }
+                            return isWatch;  
+                        }else{
+                            return false;
+                        }
                     } else {
-                        isMatch = false;
-                        return isMatch;
+                        return false;
                     }
+                } else if (selector.indexOf(">") != -1) {
+                    selectorParts = selector.split(">");
+                } else if (selector.indexOf("~") != -1) {
+                    selectorParts = selector.split("~");
+                } else if (selector.indexOf("+") != -1) {
+                    selectorParts = selector.split("+");
+                } else if (selector.indexOf("||") != -1) {
+                    selectorParts = selector.split("||");
+                } else {
+                    isMatch = easySelectorMatch(selector,element);
                 }
-
-                var classSelector = reg_class.exec(selector);
-                if (classSelector) {
-                    var clName = element.getAttribute("class");
-                   
-                    if (clName && clName === classSelector[0].replace(".", "")) {
-                        isMatch = true;
-                    }else {
-                        isMatch = false;
-                        return isMatch;
-                    }
-                }
-
+            }else{
+                isMatch = false;
+                console.log("element is not exists!");
             }
+            
 
             return isMatch;
         }
 
-        console.log(match("#myId", document.getElementById("myId")));
-        console.log(match(".myClass", document.getElementById("myId")));
-        console.log(match("#myId.myClass2", document.getElementById("myId")));
+        //简单比较器的匹配（包含复合选择器)
+        function easySelectorMatch(selector,element){
+            var isMatch = false;
+            // 定义简单浏览器的正则匹配规则
+            var reg_class = new RegExp('\\.[a-zA-Z0-9]{1,}', 'g');
+            var reg_id = new RegExp('#[a-zA-Z0-9]{1,}', 'g');
+            var reg_tag = new RegExp('[a-zA-Z0-9]{1,}', 'g');
+            // var reg_pseudo_class = new RegExp(':[a-zA-Z0-9]{1,}', 'g');
+
+            var idSelector = reg_id.exec(selector);
+            if (idSelector) {
+                var attr = element.getAttribute("id");
+                if (attr && attr === idSelector[0].replace("#", '')) {
+                    console.log(`id选择器#${attr}与元素${element.tagName}匹配成功！`);
+                    isMatch = true;
+                    return isMatch;
+                } else {
+                    console.log(`id选择器#${attr}与元素${element.tagName}匹配失败！`);
+                    isMatch = false;
+                    return isMatch;
+                }
+            }
+
+            var classSelector = reg_class.exec(selector);
+            if (classSelector) {
+                var clName = element.getAttribute("class");
+
+                if (clName && clName === classSelector[0].replace(".", "")) {
+                    console.log(`class选择器.${clName}与元素${element.tagName}匹配成功！`);
+                    isMatch = true;
+                    return isMatch;
+                } else {
+                    console.log(`class选择器.${clName}与元素${element.tagName}匹配失败！`);
+                    isMatch = false;
+                    return isMatch;
+                }
+            }
+
+            var tagSelector = reg_tag.exec(selector);
+            if (tagSelector) {
+                if(!element.tagName){
+                    var tagName = element.tagName.toUpperCase();
+                    if (tagSelector[0].toUpperCase() === tagName) {
+                        console.log(`标签选择器${tagName}与元素${element.tagName}匹配成功！`);
+                        isMatch = true;
+                        return isMatch;
+                    } else {
+                        console.log(`标签选择器${tagName}与元素${element.tagName}匹配失败！`);
+                        isMatch = false;
+                        return isMatch;
+                    }
+                }
+            }
+
+            return isMatch;
+        }
+        
+        // 简单选择器 验证
+        // console.log(match("#myId", document.getElementById("myId")));
+        // console.log(match(".myClass", document.getElementById("myId")));
+        // console.log(match("#myId.myClass2", document.getElementById("myId")));
+        // console.log(match("span", document.getElementsByTagName("span")[0]));
+
+
+        // 后代选择器 验证  
+        console.log(match("div2 span", document.getElementById("spanid")));
+
     </script>
 </body>
  
