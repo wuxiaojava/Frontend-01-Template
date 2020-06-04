@@ -1,21 +1,64 @@
 <!DOCTYPE html>
-    <head>
-        <meta charset="utf8"/>
-        <title>selector match</title>
-         
-    </head>
-    <body>
-        
-        <script>
-            function match(selector, element) {
-                //先判断是否存在复合选择器，将复合选择器拆成若干个选择器组成的数组
-                
-                return true;
+<head>
+    <meta charset="utf8"/>
+    <title>selector match</title>
+    
+</head>
+<body>
+    <div id="myId" class="myClass"></div>
+    <script>
+        function match(selector, element) {
+            var isMatch = false;
+
+            // 定义简单浏览器的正则对象
+            var reg_class = new RegExp('\\.[a-zA-Z0-9]{1,}', 'g');
+            var reg_id = new RegExp('#[a-zA-Z0-9]{1,}', 'g');
+            var reg_pseudo_class = new RegExp(':[a-zA-Z0-9]{1,}', 'g');
+
+            var selectorParts = [];
+           
+            if (selector.indexOf(" ") != -1) {
+                selectorParts = selector.split(" ");
+            } else if (selector.indexOf(">") != -1) {
+                selectorParts = selector.split(">");
+            } else if (selector.indexOf("~") != -1) {
+                selectorParts = selector.split("~");
+            } else if (selector.indexOf("+") != -1) {
+                selectorParts = selector.split("+");
+            } else if (selector.indexOf("||") != -1) {
+                selectorParts = selector.split("||");
+            } else {
+                var idSelector = reg_id.exec(selector);
+                if (idSelector) {
+                    var attr = element.getAttribute("id");
+                    if (attr && attr === idSelector[0].replace("#", '')) {
+                        isMatch = true;
+                    } else {
+                        isMatch = false;
+                        return isMatch;
+                    }
+                }
+
+                var classSelector = reg_class.exec(selector);
+                if (classSelector) {
+                    var clName = element.getAttribute("class");
+                   
+                    if (clName && clName === classSelector[0].replace(".", "")) {
+                        isMatch = true;
+                    }else {
+                        isMatch = false;
+                        return isMatch;
+                    }
+                }
+
             }
 
+            return isMatch;
+        }
 
-            match("div #id.class", document.getElementById("id"));  
+        console.log(match("#myId", document.getElementById("myId")));
+        console.log(match(".myClass", document.getElementById("myId")));
+        console.log(match("#myId.myClass2", document.getElementById("myId")));
+    </script>
+</body>
  
-        </script>
-    </body>
-    
