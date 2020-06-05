@@ -9,7 +9,13 @@
     <div class="parent">
         <div>
             <span id="spanid"> 
-
+                0000
+            </span>
+            <span id="spanid1">
+                1111
+            </span>
+            <span id="spanid2">
+                2222
             </span>
         </div>
     </div>
@@ -20,7 +26,7 @@
                 var selectorParts = [];
 
                 // 后代选择器
-                if (selector.indexOf(" ") != -1) {
+                if (selector.indexOf(" ") != -1 && selector.indexOf(">") === -1 && selector.indexOf("~") === -1 && selector.indexOf("+") === -1) {
                     //获取后代选择器的两部分
                     selectorParts = selector.split(" ");
                     //获取后代选择器
@@ -51,11 +57,65 @@
                         return false;
                     }
                 } else if (selector.indexOf(">") != -1) {
+                    //获取直接后代选择器的两部分
                     selectorParts = selector.split(">");
+                    //获取后代选择器
+                    currentSelector = selectorParts[1];
+                    console.log(element.tagName);
+                    //匹配当前元素与选择器的后代选择器部分
+                    isWatch = easySelectorMatch(currentSelector, element);
+
+                    //最尾部标签匹配成功后，去匹配父代的节点
+                    if (isWatch) {
+                        var pNode = element.parentNode;
+                        console.log(pNode.nodeName);
+                        if (pNode) {
+                            isContinue = true;
+                            if (pNode) {
+                                isWatch = easySelectorMatch(selectorParts[0], pNode);
+                            }
+                            return isWatch;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
                 } else if (selector.indexOf("~") != -1) {
                     selectorParts = selector.split("~");
+                    currentSelector = selectorParts[1];
+                    console.log(element.tagName);
+                    //匹配当前元素与选择器的后代选择器部分
+                    isWatch = easySelectorMatch(currentSelector, element);
+
+                    //最尾部标签匹配成功后，去匹配同级的节点
+                    if (isWatch) {
+                        element = element.previousElementSibling;
+                        while(element){
+                            isMatch = easySelectorMatch(selector, element);
+                            if(!isWatch){
+                                element = element.previousElementSibling;
+                            }else{
+                                break;
+                            }
+                        }
+                        return isMatch;
+                    }
                 } else if (selector.indexOf("+") != -1) {
                     selectorParts = selector.split("+");
+                    currentSelector = selectorParts[1];
+                    console.log(element.tagName);
+                    //匹配当前元素与选择器的后代选择器部分
+                    isWatch = easySelectorMatch(currentSelector, element);
+
+                    //最尾部标签匹配成功后，去匹配同级的节点
+                    if (isWatch) {
+                        element = element.previousElementSibling;
+                        if (element) {
+                            isMatch = easySelectorMatch(selector, element);
+                        }
+                        return isMatch;
+                    }
                 } else if (selector.indexOf("||") != -1) {
                     selectorParts = selector.split("||");
                 } else {
@@ -65,8 +125,6 @@
                 isMatch = false;
                 console.log("element is not exists!");
             }
-            
-
             return isMatch;
         }
 
@@ -110,7 +168,7 @@
 
             var tagSelector = reg_tag.exec(selector);
             if (tagSelector) {
-                if(!element.tagName){
+                if(element.tagName){
                     var tagName = element.tagName.toUpperCase();
                     if (tagSelector[0].toUpperCase() === tagName) {
                         console.log(`标签选择器${tagName}与元素${element.tagName}匹配成功！`);
@@ -135,8 +193,14 @@
 
 
         // 后代选择器 验证  
-        console.log(match("div2 span", document.getElementById("spanid")));
+        // console.log(match(".parent span", document.getElementById("spanid")));
 
+        // 直接后代选择器
+        // console.log(match("div > span", document.getElementById("spanid")));
+
+        // console.log(match("span ~ span", document.getElementById("spanid2")));
+
+        // console.log(match("span + span", document.getElementById("spanid2")));
     </script>
 </body>
  
