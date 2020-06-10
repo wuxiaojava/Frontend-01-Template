@@ -5,7 +5,6 @@ function getStyle(element){
 
     for(let prop in element.computeStyle){
         var p = element.computeStyle.value;
-        // console.log(element.computeStyle[prop]);
         var propValue = element.computeStyle[prop];
         element.style[prop] = propValue;
 
@@ -17,7 +16,6 @@ function getStyle(element){
             element.style[prop] = parseInt(element.style[prop]);
         }
     }
-    // console.log("style:"+element.style);
     return element.style;
 }
 
