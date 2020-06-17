@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<head>
+    <style>
+        #board {
+            width: 350px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: solid 1px white;
+            display: inline-block;
+            background-color: green;
+            vertical-align: middle;
+
+            line-height: 100px;
+            font-size: 50px;
+            text-align: center;
+            color: red;
+        }
+    </style>
+    <title>
+        Game TicTacToe
+    </title>
+</head>
+<body>
+    <div id="board">
+
+    </div>
+    <script>
+        // 初始化棋盘为空棋盘
+        let pattern = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ];
+
+        // color为标识cell的状态  0.空 1.O 2.X  O先行  3-color标识下一个落子的类型
+        let color = 1;
+
+        // 绘制棋盘
+        function show() {
+            // 获取棋盘对象
+            let board = document.getElementById("board");
+
+            // 讲棋盘内容置空
+            board.innerHTML = "";
+
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    let cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    //绘制落子的样式
+                    cell.innerHTML = pattern[i][j] == 2 ? "X" :
+                        pattern[i][j] == 1 ? "O" :
+                        "";
+
+                    //增加click事件 传入落子位置
+                    cell.addEventListener("click", () => move(j, i));
+
+                    // 棋盘添加cell
+                    board.appendChild(cell);
+                }
+                // 每行最后进行换行
+                board.appendChild(document.createElement("br"));
+            }
+        }
+
+        // 持方落棋
+        function move(row, column) {
+            // 判断不可重复落子
+            if (pattern[column][row] != 0) {
+                return;
+            }
+
+            // 给对应的cell赋值
+            pattern[column][row] = color;
+
+            // 重新绘制棋盘
+            show(pattern);
+
+            // 判断当前持方是否获胜
+            if (check(pattern)) {
+                alert(color == 2 ? "X is winner !" : "O is winner!");
+                if(window.confirm("Is open a new Game?")){
+                    init(pattern);
+                }
+            }
+
+            // 判断当前持方是否将获胜
+            let point = willWin(pattern, color);
+
+            if (point) {
+                alert(color == 2 ? `Move to [${point}], X will winner !` : `Move to [${point}], O will winner!`)
+            }
+
+            // 指定下一个持方
+            color = 3 - color;
+        }
+
+        // 检查当前持方是否获胜
+        function check(pattern) {
+            // 以当前的落子位置及持方作为判断的条件进行判断
+            //横向判断
+            for (let i = 0; i < pattern.length; i++) {
+                let win = true;
+                for (let j = 0; j < pattern[0].length; j++) {
+                    if (pattern[i][j] != color) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+
+            //纵向判断
+            for (let i = 0; i < pattern.length; i++) {
+                let win = true;
+                for (let j = 0; j < pattern[0].length; j++) {
+                    if (pattern[j][i] != color) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+
+            //对角线 [0,2],[1,1],[2,0]  规则: x + y = 2
+            {
+                let win = true;
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[j][2 - j] != color) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return win;
+                }
+            }
+
+            //对角线 [0,0],[1,1],[2,2] 规则：x = y
+            {
+                let win = true;
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[j][j] != color) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return win;
+                }
+            }
+
+        }
+
+        // 克隆 当前棋盘状态  避免干扰
+        function clone(pattern) {
+            return JSON.parse(JSON.stringify(pattern));
+        }
+
+        function willWin(pattern, color) {
+            //遍历 空元素，判断当前持方是否可能胜利
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[j][i] == '0') {
+                        var tmp = clone(pattern);
+                        tmp[j][i] = color;
+                        if (check(tmp)) {
+                            let point = [j, i];
+                            let index = j * 3 + i;//计算下标
+                            let next = document.getElementsByClassName("cell")[index];
+                            next.style["background-color"] = "yellow";
+                            return point;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        // 初始化棋盘
+        function init(pattern) {
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    pattern[j][i] = 0;
+                }
+            }
+            show();
+        }
+
+        // 开始绘制棋盘
+        init(pattern);
+    </script>
+</body>
+
+
