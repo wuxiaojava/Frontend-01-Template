@@ -1,0 +1,114 @@
+<meta charset="utf-8"></meta>
+<style>
+    .cell {
+        width:6px;
+        height:6px;
+        background-color: gray;
+        border-bottom:solid 1px white;
+        border-right:solid 1px white;
+        line-height: 7px;
+    }
+
+    #container{
+        display: flex;
+        flex-wrap: wrap;
+        width:701px;
+    }
+</style>
+
+<div id="container">
+
+</div> 
+<button onclick="doSave();">save</button>
+<script>
+    let mousedown = false;
+    let clear = false;
+    
+    console.log(localStorage.map);
+    // let map = new Array(10000).fill(0);
+    let map = localStorage.map==null ?  JSON.parse(localStorage.map) : new Array(10000).fill(0);
+    // console.log(map);
+    // let map = localStorage.map ? JSON.parse(localStorage.map) : new Array(10000).fill(0);
+    let container = document.getElementById("container");
+    for(let y = 0 ; y < 100; y++){
+        for(let x = 0 ; x < 100; x++){
+            let cell = document.createElement("div");
+            cell.classList.add("cell");
+
+            if(map[100 * y + x] === 1){
+                cell.style.backgroundColor = "black";
+            }
+
+            cell.addEventListener("mouseover",()=>{
+                if(mousedown){
+                    if(clear){
+                        cell.style.backgroundColor = "gray";
+                        map[100 * y + x] = 0;
+                    }else{
+                        cell.style.backgroundColor = "black";
+                        map[100 * y + x] = 1;
+                    }
+                }
+            });
+
+            container.appendChild(cell);
+        }
+    }
+
+   
+    document.addEventListener("mousedown",e => {
+        mousedown = true;
+        clear = (e.which === 3);
+    });
+
+    document.addEventListener("mouseup",()=>{
+        mousedown = false;
+    });
+
+    document.addEventListener("contextmenu",e => {
+        e.preventDefault();
+    });
+
+    function doSave(){
+        localStorage.map = JSON.stringify(map);
+    }
+
+    function sleep(t){
+        return new Promise(resolve =>{
+            setTimeout(resolve, t);
+        });
+    }
+
+    async function findPath(map,start,end){
+        map = map.slice();
+        let queue = [start];
+
+        async function insert([x,y]){
+            if(map[100 * y +x] != 0){
+                return;
+            }
+            if(x < 0 || y < 0 || x >= 100 || y >= 100){
+                return;
+            }
+
+            map[100 * y +x] = 2;
+            container.children[100 * y + x].style.backgroundColor = "lightGreen";
+            await sleep(5);
+            queue.push([x,y])
+        }
+
+        while(queue.length){
+            let [x,y] = queue.shift();
+            if(x === end[0] && y === end[1]){
+                return true;
+            }
+            await insert([x-1,y]);
+            await insert([x+1,y]);
+            await insert([x,y-1]);
+            await insert([x,y+1])
+        }
+
+        return false;
+        
+    }
+</script>
