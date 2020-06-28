@@ -21,29 +21,37 @@
 </div> 
 <button onclick="doSave();">save</button>
 <script>
+    //定义mousedown变量，作为画图的条件
     let mousedown = false;
+
+    //定义clear变量，作为是否开启清除模式的判断
     let clear = false;
-    
-    console.log(localStorage.map);
-    // let map = new Array(10000).fill(0);
+
+    //定义map获取地图的数据 如果localstorage中存在，则以存储数据为准
     let map = localStorage.map != null ?  JSON.parse(localStorage.map) : new Array(10000).fill(0);
-    // console.log(map);
-    // let map = localStorage.map ? JSON.parse(localStorage.map) : new Array(10000).fill(0);
+   
+    // 获取当前容器对象
     let container = document.getElementById("container");
+
+    // 绘制100*100的地图
     for(let y = 0 ; y < 100; y++){
         for(let x = 0 ; x < 100; x++){
+            // 创建cell对象
             let cell = document.createElement("div");
+            
+            // 给cell对象增加样式
             cell.classList.add("cell");
 
-
-            console.log(`${[y,x]} ====> ${map[100*y + x]}`);
+            // 初始化地图，如果cell对应的值为1 ，则修改cell的背景颜色
             if(map[100 * y + x] === 1){
-                console.log([y,x]);
                 cell.style.backgroundColor = "black";
             }
 
+            // 给cell增加mouseover事件
             cell.addEventListener("mouseover",()=>{
+                // 判断mousedown变量
                 if(mousedown){
+                    // 判断画笔状态  根据状态修改对应cell的背景颜色
                     if(clear){
                         cell.style.backgroundColor = "gray";
                         map[100 * y + x] = 0;
@@ -54,72 +62,100 @@
                 }
             });
 
+            // 向container中增加cell对象
             container.appendChild(cell);
         }
     }
 
-   
+    // 监控mousedown事件
     document.addEventListener("mousedown",e => {
         mousedown = true;
+        //设置clear遍历的值 which=3 鼠标右键  开启清除模式
         clear = (e.which === 3);
     });
 
+    //增加mouseup监控事件
     document.addEventListener("mouseup",()=>{
         mousedown = false;
     });
 
+    //增加清除功能
     document.addEventListener("contextmenu",e => {
         e.preventDefault();
     });
 
+    //保存功能，将当前画的点，保存到localStorage中，key值为map 
     function doSave(){
         localStorage.map = JSON.stringify(map);
     }
 
-    function sleep(t){
+    //用同步方式，实现异步效果
+    async function sleep(t){
         return new Promise(resolve =>{
             setTimeout(resolve, t);
         });
     }
 
+    //寻路方法
     async function findPath(map,start,end){
+        //返回一个新的数组对象
         map = map.slice();
+
+        //定义一个数组，用来记录扫描过的点
         let queue = [start];
+
+        //定义一个数组，用来记录搜索路径
         let path = [];
+
         // let stack = [start];深度优先
 
+        //将指定元素加入到队列queue中
         async function insert([x,y],pre){
+            //判断是否已被占用
             if(map[100 * y +x] != 0){
                 return;
             }
+
+            //判断是否越界
             if(x < 0 || y < 0 || x >= 100 || y >= 100){
                 return;
             }
 
-            map[100 * y +x] = pre;
+            //每个点的值为其发起点
+            map[100 * y + x] = pre;
+            // console.log(`${[y,x]} ============ ${map[100 * y + x ]}`);
+
             container.children[100 * y + x].style.backgroundColor = "lightGreen";
-            await sleep(5);
+            await sleep(1);
             queue.push([x,y])
         }
 
+        //判断队列中是否存在元素
         while(queue.length){
-            let [x,y] = queue.shift();
-            
-            if(x === end[0] && y === end[1]){
-                while(x !== start[0] && y !== start[1]){
-                    path.push([x,y]);
-                    console.log([x,y]);
+            //从数组头删除一个元素，并返回其值
+            let [x,y] = queue.shift(); 
+
+            //判断当前队列的第一个元素是否为搜索的元素
+            if (x === end[0] && y === end[1]) {
+                //递归调用，如果寻到了对应的cell，则将寻找路径找到
+                while (x !== start[0] || y !== start[1]) {
+                    path.push([x, y]);
                     container.children[100 * y + x].style.backgroundColor = "pink";
-                    [x,y] = map[100 * y + x];
+                    [x, y] = map[100 * y + x];
                 }
-    
+
+                return path;
             }
-            await insert([x-1,y],[x,y]);
-            await insert([x+1,y],[x,y]);
-            await insert([x,y-1],[x,y]);
-            await insert([x,y+1],[x,y])
+            
+            //插入当前元素的上下左右四个位置的点到队列中
+            await insert([x - 1, y], [x, y]);
+            await insert([x + 1, y], [x, y]);
+            await insert([x, y - 1], [x, y]);
+            await insert([x, y + 1], [x, y]);
         }
 
-        return path;
+        //处理开始点和结束点
+        container.childeren[100 * start[1] + start[0]].style.backgroundColor = "red";
+        container.childeren[100 * end[1] + end[0]].style.backgroundColor = "red";
     }
 </script>
