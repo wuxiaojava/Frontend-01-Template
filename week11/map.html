@@ -144,6 +144,9 @@
                     [x, y] = map[100 * y + x];
                 }
 
+                //处理开始点和结束点
+                container.children[100 * start[1] + start[0]].style.backgroundColor = "red";
+                container.children[100 * end[1] + end[0]].style.backgroundColor = "red";
                 return path;
             }
             
@@ -154,8 +157,6 @@
             await insert([x, y + 1], [x, y]);
         }
 
-        //处理开始点和结束点
-        container.childeren[100 * start[1] + start[0]].style.backgroundColor = "red";
-        container.childeren[100 * end[1] + end[0]].style.backgroundColor = "red";
+        
     }
 </script>
