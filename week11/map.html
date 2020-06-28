@@ -26,7 +26,7 @@
     
     console.log(localStorage.map);
     // let map = new Array(10000).fill(0);
-    let map = localStorage.map==null ?  JSON.parse(localStorage.map) : new Array(10000).fill(0);
+    let map = localStorage.map != null ?  JSON.parse(localStorage.map) : new Array(10000).fill(0);
     // console.log(map);
     // let map = localStorage.map ? JSON.parse(localStorage.map) : new Array(10000).fill(0);
     let container = document.getElementById("container");
@@ -35,7 +35,10 @@
             let cell = document.createElement("div");
             cell.classList.add("cell");
 
+
+            console.log(`${[y,x]} ====> ${map[100*y + x]}`);
             if(map[100 * y + x] === 1){
+                console.log([y,x]);
                 cell.style.backgroundColor = "black";
             }
 
