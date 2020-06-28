@@ -82,8 +82,10 @@
     async function findPath(map,start,end){
         map = map.slice();
         let queue = [start];
+        let path = [];
+        // let stack = [start];深度优先
 
-        async function insert([x,y]){
+        async function insert([x,y],pre){
             if(map[100 * y +x] != 0){
                 return;
             }
@@ -91,7 +93,7 @@
                 return;
             }
 
-            map[100 * y +x] = 2;
+            map[100 * y +x] = pre;
             container.children[100 * y + x].style.backgroundColor = "lightGreen";
             await sleep(5);
             queue.push([x,y])
@@ -99,16 +101,22 @@
 
         while(queue.length){
             let [x,y] = queue.shift();
+            
             if(x === end[0] && y === end[1]){
-                return true;
+                while(x !== start[0] && y !== start[1]){
+                    path.push([x,y]);
+                    console.log([x,y]);
+                    container.children[100 * y + x].style.backgroundColor = "pink";
+                    [x,y] = map[100 * y + x];
+                }
+    
             }
-            await insert([x-1,y]);
-            await insert([x+1,y]);
-            await insert([x,y-1]);
-            await insert([x,y+1])
+            await insert([x-1,y],[x,y]);
+            await insert([x+1,y],[x,y]);
+            await insert([x,y-1],[x,y]);
+            await insert([x,y+1],[x,y])
         }
 
-        return false;
-        
+        return path;
     }
 </script>
