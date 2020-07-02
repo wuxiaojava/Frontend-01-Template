@@ -26,22 +26,27 @@
                     max = node.$;
                     maxWord = word;
                 }
+                for (let p in node) {
+                    visit(node[p], word + p)
+                }
             }
 
+            visit(this.root,"");
+            console.log(maxWord);
         }
     }
 
     function randomWord(length){
         var s = "";
         for(let i = 0; i<length;i++){
-            s += String.fromCharCode(Math.random() * 26 + "a".charAt(0))
+            s += String.fromCharCode(Math.random() * 26 + "a".charCodeAt(0))
         }
         return s;
     }
 
     let trie = new Trie();
 
-    for(let i = 0 ; i < 10000; i++){
+    for(let i = 0 ; i < 100000; i++){
         let random = randomWord(4);
         trie.insert(random);
     }
