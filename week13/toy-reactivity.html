@@ -30,7 +30,7 @@
         }
 
         // 返回代理对象
-        return new Proxy(object,{
+        let proxy = new Proxy(object,{
             //进行依赖收集
             get(obj,prop){
                 usedReactivities.push([obj,prop]);
@@ -50,9 +50,9 @@
             }
         })
 
-        // reactivities.set(obj,proxy);
-        // reactivities.set(proxy,proxy);
-        // return true;
+        reactivities.set(obj,proxy);
+        reactivities.set(proxy,proxy);
+        return proxy;
     }
 
     // handler===callback
