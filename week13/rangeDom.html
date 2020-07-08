@@ -9,7 +9,7 @@
     文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
 </div>
 
-<div id="dragable" style="width:100px;height:100px;background-color:pink;"></div>
+<div id="dragable" style="width:100px;height:100px;background-color:pink;display:inline-block;"></div>
 <script>
     let dragable = document.getElementById("dragable");
     let baseX = 0,baseY = 0;
@@ -18,12 +18,9 @@
         let startX = event.clientX;
         let startY = event.clientY;
 
-        let move = event => {
-            // let x = baseX + event.clientX - startX;
-            // let y = baseY + event.clientY - startY;
+        let move = event => { 
             let range = nearest(event.clientX,event.clientY);
-            range.insertNode(dragable);
-            // dragable.style.transform = `translate(${x}px,${y}px)`;
+            range.insertNode(dragable); 
         };
 
         let up = event => {
@@ -41,12 +38,10 @@
     let ranges = [];
     let container = document.getElementById("container");
 
-    for(let i = 0; i < container.childNodes[0].textContent.length;i ++){
+    for(let i = 0; i < container.childNodes[0].textContent.length;i += 3){
         let range = document.createRange();
         range.setStart(container.childNodes[0],i);
         range.setEnd(container.childNodes[0],i);
-
-        console.log(range.getBoundingClientRect());
         ranges.push(range);
     }
 
@@ -65,5 +60,5 @@
         return nearestRange;
     }
     
-    // document.addEventListener("select",)
+    document.addEventListener("selectstart",event => event.preventDefault());
 </script>
