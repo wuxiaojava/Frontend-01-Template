@@ -1,0 +1,109 @@
+<!--定义三个滚动条，用来代表rgb的三个颜色值-->
+<input id="r" type="range" min="0" max="255" />
+<input id="g" type="range" min="0" max="255" />
+<input id="b" type="range" min="0" max="255" />
+
+<!--定义一个颜色div，用来表示当前rgb三个值，对应的颜色-->
+<div id="color" style="width:100px; height:100px;border: 1px solid black;"></div>
+
+<script>
+    // 记录依赖收集的数据  key: object  value:Map<key(prop),value([handler]>
+    let handlers = new Map();
+
+    let usedReactivities = [];
+    // 定义记录已经生成代理的对象Map
+    let reactivities = new Map();
+
+    //定义一个普通对象，用来初始化调色板的三个属性值 r g b 
+    let object = {
+        r : 127,
+        g : 127,
+        b : 127
+    }
+    
+    //模拟vue3.0的reactive方法，使用代理方式进行对象绑定操作
+    function reactive(obj){
+        // 判断当前对象是否已经产生过代理对象
+        if(reactivities.has(obj)){
+            //如果已经产生过，则返回该代理对象
+            return reactivities.get(obj);
+        }
+
+        // 返回代理对象
+        return new Proxy(object,{
+            //进行依赖收集
+            get(obj,prop){
+                usedReactivities.push([obj,prop]);
+                if(typeof obj[prop] === "object"){
+                    return reactive(obj[prop]);
+                }
+                return obj[prop];
+            },
+            set(obj,prop,val){
+                obj[prop] = val;
+                
+                if(handlers.get(obj))
+                    if(handlers.get(obj).get(prop))
+                        for(let handler of handlers.get(obj).get(prop))
+                            handler();
+                return obj[prop];
+            }
+        })
+
+        // reactivities.set(obj,proxy);
+        // reactivities.set(proxy,proxy);
+        // return true;
+    }
+
+    // handler===callback
+    function effect(handler){
+        usedReactivities = [];
+        handler();
+        for(let userReactivity of usedReactivities){
+            let [obj,prop] = userReactivity;
+            if(!handlers.has(obj)){
+                handlers.set(obj,new Map());
+            }
+
+            if(!handlers.get(obj).has(prop)){
+                handlers.get(obj).set(prop,[]);
+            }
+
+            handlers.get(obj).get(prop).push(handler);
+        }
+    }
+
+    //获取指定对象的代理对象
+    let p = reactive(object);
+
+    effect(()=>{
+        document.getElementById("r").value = p.r;
+        document.getElementById("r").title = p.r;
+    });
+
+    document.getElementById("r").addEventListener("input",event => {
+        p.r = event.target.value;
+    });
+
+    effect(()=>{
+        document.getElementById("g").value = p.g;
+        document.getElementById("g").title = p.g;
+    });
+
+    document.getElementById("g").addEventListener("input",event => {
+        p.g = event.target.value;
+    });
+
+    effect(()=>{
+        document.getElementById("b").value = p.b;
+        document.getElementById("b").title = p.b;
+    });
+
+    document.getElementById("b").addEventListener("input",event => {
+        p.b = event.target.value;
+    });
+
+    effect(()=>{
+        document.getElementById("color").style.backgroundColor = `rgb(${p.r},${p.g},${p.b})`;
+    });
+</script>
