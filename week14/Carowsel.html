@@ -1,0 +1,156 @@
+<html>
+    <head>
+        <title>Carowsel Component</title></title>
+        <style>
+            .carowsel {
+                width: 500px;
+                height: 300px;
+                white-space: nowrap;
+                outline: solid 1px blue;
+                overflow: hidden;
+                margin: auto;
+            }
+        
+            .carowsel>img {
+                width: 500px;
+                height: 300px;
+                display: inline-block;
+                transition: transform ease 0.5s ;
+            }
+        </style>
+    </head>
+   
+    <body>
+        <div id="container">
+        </div>
+        <script>
+            // 定义轮播类
+            class Carowsel{
+                // 构造函数
+                constructor(){
+                    this.root = null;
+                    this.data = null;
+                }
+
+                // 渲染方法
+                render() {
+                    //定义根元素
+                    this.root = document.createElement("div");
+                    // 根元素增加样式
+                    this.root.classList.add("carowsel");
+
+                    // 遍历数据，增加img对象，加到root元素上
+                    for(let d of this.data){
+                        let element = document.createElement("img");
+                        element.src = d;
+                        element.addEventListener("dragstart",event => {
+                            event.preventDefault();
+                        });
+                        this.root.appendChild(element);
+                    }
+
+                    //定义坐标，记录当前展示的数组位置
+                    let position = 0;
+
+                    //定义轮播函数
+                    let nextPic = () => {
+                        let nextPosition = (position + 1) % this.data.length;
+
+                        let current = this.root.children[position];
+                        let next = this.root.children[nextPosition];
+
+                        current.style.transition = "ease 0s";
+                        next.style.transition = "ease 0s";
+
+                        current.style.transform = `translateX(${- 100 * position}%)`;
+                        next.style.transform = `translateX(${100 - 100 * nextPosition}%)`;
+                        setTimeout(() => {
+                            current.style.transition = ""; //= "" means use css ruler
+                            next.style.transition = "";
+                            current.style.transform = `translateX(${-100 - 100 * position}%)`;
+                            next.style.transform = `translateX(${-100 * nextPosition}%)`;
+                            position = nextPosition;
+                        }, 16);
+                        
+                        setTimeout(nextPic, 3000);
+                    };
+                    
+                    // setTimeout(nextPic, 3000);
+                    this.root.addEventListener("mousedown", event =>
+                    {
+                        let startX = event.clientX, startY = event.clientY;
+
+                        let lastPosition = (position - 1 + this.data.length) % this.data.length;
+                        let nextPosition = (position + 1) % this.data.length;
+                        
+                        // 获取当前及下一个元素对象
+                        let current = this.root.childNodes[position];
+                        let last = this.root.children[lastPosition]
+                        let next = this.root.childNodes[nextPosition];
+
+                        current.style.transition = "ease 0s";
+                        last.style.transition = "ease 0s"
+                        next.style.transition = "ease 0s";
+
+
+                        current.style.transform = `translateX(${- 500 * position}px`;
+                        last.style.transform = `translateX(${- 500 - 500* lastPosition}px`;
+                        next.style.transform = `translateX(${500 - 500 * nextPosition}px`;
+
+                        let move = event => {
+                            
+                            current.style.transform = `translateX(${event.clientX - startX - 500 * position}px`;
+                            last.style.transform = `translateX(${event.clientX - startX - 500 - 500 * lastPosition}px`;
+                            next.style.transform = `translateX(${event.clientX - startX + 500 - 500 * nextPosition}px`;
+                            // console.log(event.clientX - startX,event.clientX - startY );
+                        }
+
+                        let up = event => {
+                            let offset = 0;
+                            // 超过一半
+                            if(event.clientX - startX > 250){
+                                offset = 1;
+                            }else if(event.clientX - startX < -250){
+                                offset = -1;
+                            }
+
+                            // 打开transition
+                            current.style.transition = "";
+                            last.style.transition = ""
+                            next.style.transition = "";
+
+                            current.style.transform = `translateX(${offset * 500 - 500 * position}px`;
+                            last.style.transform = `translateX(${offset * 500 - 500 - 500 * lastPosition}px`;
+                            next.style.transform = `translateX(${offset * 500 + 500 - 500 * nextPosition}px`;
+                            position = (position - offset + this.data.length) % this.data.length;
+
+                            document.removeEventListener("mousemove",move);
+                            document.removeEventListener("mouseup", up);
+                        }   
+
+                        document.addEventListener("mousemove",move);
+                        document.addEventListener("mouseup",up);
+
+                    });
+                }
+            }
+
+            //定义轮播对象
+            let carowsel = new Carowsel();
+
+            // 赋值数据
+            carowsel.data = [
+                "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",
+                "https://static001.geekbang.org/resource/image/1b/21/1b809d9a2bdf3ecc481322d7c9223c21.jpg",
+                "https://static001.geekbang.org/resource/image/b6/4f/b6d65b2f12646a9fd6b8cb2b020d754f.jpg",
+                "https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg",
+            ];
+
+            // 调用渲染函数
+            carowsel.render();
+
+            //mount 将组件对象，挂载到父容器上
+            document.getElementById("container").appendChild(carowsel.root);
+        </script>
+    </body>
+</html>
